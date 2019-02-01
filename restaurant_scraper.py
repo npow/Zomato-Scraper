@@ -51,6 +51,12 @@ class ZomatoRestaurant:
         name_anchor = soup.find("a", attrs={"class": "ui large header left"})
         if name_anchor:
             rest_details['name'] = name_anchor.text.strip()
+            rest_details['types'] = []
+            try:
+                for anchor in name_anchor.parent.findNextSibling().findChildren()[2].find_all('a'):
+                    rest_details['types'].append(anchor.text)
+            except:
+                pass
         else:
             rest_details['name'] = ''
 
@@ -77,7 +83,7 @@ class ZomatoRestaurant:
             geo_url = geo_locale.attrs['data-url']
             parsed_url = urlparse(geo_url)
             geo_arr = str(urllib.parse.parse_qs(parsed_url.query)['center']).split(',')
-            rest_details['geo_location'] = [re.sub("[^0-9\.]", "", geo_arr[0]), re.sub("[^0-9\.]", "", geo_arr[1])]
+            rest_details['geo_location'] = [re.sub("[^0-9\.-]", "", geo_arr[0]), re.sub("[^0-9\.-]", "", geo_arr[1])]
         if 'geo_location' not in rest_details:
             rest_details['geo_location'] = ['undefined', 'undefined']
 

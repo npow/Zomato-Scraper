@@ -15,11 +15,11 @@ import sys
 browser = None
 
 try:
-    browser = webdriver.Firefox()
+    browser = webdriver.Chrome()
 except Exception as error:
     print(error)
 
-out_file = open("bangalore_restaurant_details.txt", "ab")
+out_file = open("toronto_restaurant_details.txt", "ab")
 
 
 class ZomatoRestaurantLinkGen:
@@ -52,9 +52,9 @@ if __name__ == '__main__':
         print("Selenium not opened")
         sys.exit()
 
-    for x in range(1, 564):
+    for x in range(1, 710):
         print(str(x) + '\n')
-        zr = ZomatoRestaurantLinkGen('https://www.zomato.com/bangalore/restaurants?page={}'.format(x))
+        zr = ZomatoRestaurantLinkGen('https://www.zomato.com/toronto/restaurants?page={}'.format(x))
         zr.scrap()
     browser.close()
     out_file.close()

@@ -15,7 +15,7 @@ import json
 
 browser = None
 try:
-    browser = webdriver.Firefox()
+    browser = webdriver.Chrome()
 except Exception as error:
     print(error)
 
@@ -34,7 +34,7 @@ class ZomatoRestaurant:
             print(str(err))
             return
         else:
-            print('Access successful.')
+            print('Access successful: ' + url)
 
         self.soup = None
         if self.html_text is not None:
@@ -45,6 +45,8 @@ class ZomatoRestaurant:
             return {}
         soup = self.soup
         rest_details = dict()
+
+        rest_details['zomato_url'] = self.url
 
         name_anchor = soup.find("a", attrs={"class": "ui large header left"})
         if name_anchor:
@@ -118,7 +120,7 @@ class ZomatoRestaurant:
 
         address_div = soup.find("div", attrs={"class": "resinfo-icon"})
         if address_div:
-            rest_details['address'] = address_div.span.get_text()
+            rest_details['address'] = address_div.get_text().strip()
         else:
             rest_details['address'] = ""
 
@@ -128,19 +130,33 @@ class ZomatoRestaurant:
         else:
             rest_details['known_for'] = ''
 
-        rest_details['what_people_love_here'] = []
+        image_div = soup.find("div", attrs={'id': 'progressive_image'})
+        if image_div:
+            rest_details['image_url'] = image_div.attrs.get('data-url', '')
+        else:
+            rest_details['image_url'] = ''
+        view_website_span = soup.find('span', attrs={'class': 'left zred'}, text='View Website')
+        if view_website_span:
+            rest_details['website'] = view_website_span.parent.attrs.get('href', '')
+        else:
+            rest_details['website'] = ''
+
+        rest_details['what_people_love_here'] = {}
         for div in soup.find_all("div", attrs={'class': 'rv_highlights__section pr10'}):
             child_div = div.find("div", attrs={'class': 'grey-text'})
             if child_div:
-                rest_details['what_people_love_here'].append(child_div.get_text())
+                category = child_div.get_text()
+                rest_details['what_people_love_here'][category] = []
+                for child_span in div.find_all("span"):
+                    rest_details['what_people_love_here'][category].append(child_span.text.strip())
         return rest_details
 
 
 if __name__ == '__main__':
     if browser is None:
         sys.exit()
-    out_file = open("zomato_bangalore.json", "a")
-    with open('bangalore_restaurant_details.txt', 'r', encoding="utf-8") as f:
+    out_file = open("zomato_toronto.json", "a")
+    with open('toronto_restaurant_details.txt', 'r', encoding="utf-8") as f:
         for line in f:
             zr = ZomatoRestaurant(line)
             json.dump(zr.scrap(), out_file)

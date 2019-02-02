@@ -1,3 +1,5 @@
 *.jsonl
 *.txt
 .ipynb_checkpoints/
+*.json
+*.pkl

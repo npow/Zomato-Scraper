@@ -46,7 +46,7 @@ class ZomatoRestaurant:
         soup = self.soup
         rest_details = dict()
 
-        rest_details['zomato_url'] = self.url
+        rest_details['zomato_url'] = self.url.strip()
 
         name_anchor = soup.find("a", attrs={"class": "ui large header left"})
         if name_anchor:
